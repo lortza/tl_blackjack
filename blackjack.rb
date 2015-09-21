@@ -13,6 +13,7 @@
 @deck = []
 
 # arrays needed for totals and play actions
+want_to_play = "Y"
 @dealer_visible_hand = []
 @dealer_visible_score = []
 @dealer_hidden_hand = []
@@ -41,7 +42,6 @@ def create_deck
 end#create_deck
 
 
-
 # methods for play actions
 def dealer_hit
   card = @deck.pop
@@ -65,6 +65,7 @@ def create_player_total
   @player_score = @player_score.inject(:+)
 end#create_total
 
+
 def create_dealer_total
   @dealer_hidden_hand.each do |x|
     @dealer_hidden_score << x[:value]
@@ -82,16 +83,30 @@ def bust
 
 end#bust
 
+def request_action
+  puts "Please choose:"
+  puts " 1) Hit"
+  puts " 2) Stand"
+  input = gets.chomp
+  if input == "1"
+    player_hit
+  else
+    puts "STAND"
+  end#if
+end#request_action
+
 def score_evaluation
   create_dealer_total
   if @player_score.to_i < 21
     puts "Dealer has #{@dealer_hidden_score}. You may Hit or Stand. "
+    request_action
   elsif @player_score.to_i == 21
     puts "You win."
   else
     puts "I'm sorry, you busted."
   end#if
 end#score_evaluation
+
 
 
 def play_game
@@ -112,19 +127,22 @@ def play_game
   puts "Your total is #{@player_score}."
   score_evaluation
   puts
-
+  
+    
 end#play_game
 
 play_game
 
+# puts "Would you like to play again?  Y | N"
+# want_to_play = gets.chomp
+# if want_to_play.upcase.include? "Y"
+#   play_game
+# else
+#   puts "okay bye"
+# end#if
 
 
-# # deal the first 2 cards
-# card = deck.pop
-# puts "Your first card is #{card}"
 
-# # evaluate the first card
-# user_score = [40]
 
 # case 
 # when card.include?("J")
@@ -145,33 +163,4 @@ play_game
 #     end#if
 # end#whencase
 
-# # calcualte score value & display it
-# user_score = user_score.inject(:+)
-# puts "Your card is #{card} and your current score is #{user_score}."
 
-# # ask user to hit or stand
-# puts "Please select an action:"
-# puts "1) Hit (draw another card)"
-# puts "2) Stand (keep your current score)"
-# action_choice = gets.chomp
-# if action_choice == "1"
-#   card = deck.pop
-#   puts "You've been dealt the #{card}."
-
-
-
-
-
-  
-# end
-
-# deal the second card
-
-
-# evaluate the second card
-
-
-# add the second card to the first card & report the total
-
-
-# evaluate the total 
