@@ -13,17 +13,14 @@
 @deck = []
 
 # arrays needed for totals and play actions
-dealer_visible_total = []
-dealer_hidden_total = []
-player_total = []
+@dealer_visible_hand = []
+@dealer_visible_score = []
+@dealer_hidden_hand = []
+@dealer_hidden_score = []
+@player_hand = []
+@player_score = []
 
 # methods to create a deck with names and values
-class String
-  def is_integer?
-    self.to_i.to_s == self
-  end
-end
-
 
 def create_deck
   (2..10).each do |num| 
@@ -33,29 +30,47 @@ def create_deck
   @deck_suits.each do |suit|
     @deck_numbers.each do |num|
       if num == "A"
-        @deck << {name: "#{num} #{suit.capitalize}", value: "ACE" }
+        @deck << {name: "#{num} #{suit.capitalize}", value: 11 }
       elsif num == "J" || num == "Q" || num == "K"
         @deck << {name: "#{num} #{suit.capitalize}", value: 10 }
       else 
-        @deck << {name: "#{num} #{suit.capitalize}", value: num }
+        @deck << {name: "#{num} of #{suit.capitalize}", value: num }
       end#if
     end#each
   end#each
 end#create_deck
 
-create_deck
-puts @deck
 
 
 # methods for play actions
 def dealer_hit
-
+  card = @deck.pop
+  @dealer_hidden_hand << card
+  @dealer_visible_hand << card
+  puts card[:name]
 end#dealer_hit
 
 
 def player_hit
-
+  card = @deck.pop
+  @player_hand << card
+  puts card[:name]
 end#player_hit
+
+
+def create_player_total
+  @player_hand.each do |x|
+    @player_score << x[:value]
+  end#each
+  @player_score = @player_score.inject(:+)
+end#create_total
+
+def create_dealer_total
+  @dealer_hidden_hand.each do |x|
+    @dealer_hidden_score << x[:value]
+  end#each
+  @dealer_hidden_score = @dealer_hidden_score.inject(:+)
+end#create_total
 
 
 def stand
@@ -67,9 +82,42 @@ def bust
 
 end#bust
 
+def score_evaluation
+  create_dealer_total
+  if @player_score.to_i < 21
+    puts "Dealer has #{@dealer_hidden_score}. You may Hit or Stand. "
+  elsif @player_score.to_i == 21
+    puts "You win."
+  else
+    puts "I'm sorry, you busted."
+  end#if
+end#score_evaluation
 
-# # shuffle the deck
-# deck.shuffle!
+
+def play_game
+  create_deck
+
+  @deck.shuffle!
+
+  puts "Dealer's Hand:"
+  dealer_hit
+  dealer_hit
+  #puts "and one card you can't see"
+  puts
+  puts "Your Hand:"
+  player_hit
+  player_hit
+  puts
+  create_player_total
+  puts "Your total is #{@player_score}."
+  score_evaluation
+  puts
+
+end#play_game
+
+play_game
+
+
 
 # # deal the first 2 cards
 # card = deck.pop
