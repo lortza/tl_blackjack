@@ -32,7 +32,7 @@ def create_deck
     @deck_numbers.each do |num|
       if num == "A"
         @deck << {name: "#{num} #{suit.capitalize}", value: 11 }
-      elsif num == "J" || num == "Q" || num == "K"
+      elsif num == "J" || num == "Q" || num == "K" # OR elsif num.to_i == 0
         @deck << {name: "#{num} #{suit.capitalize}", value: 10 }
       else 
         @deck << {name: "#{num} of #{suit.capitalize}", value: num }
@@ -59,10 +59,11 @@ end#player_hit
 
 
 def calculate_score(hand, score)
+  catcher = []
   hand.each do |x|
-    score << x[:value]
+    catcher << x[:value]
   end#each
-  score = score.inject(:+)
+  score = catcher.inject(:+)
   #puts "calculate_score's score: #{score}"
   score
 end#calculate_score
@@ -89,7 +90,7 @@ def request_action
 end#request_action
 
 def score_evaluation
-  calculate_score(@dealer_hidden_hand, @dealer_hidden_score)
+  puts
   if @player_score.to_i < 21
     puts "Dealer has #{@dealer_hidden_score}. You may Hit or Stand. "
     request_action
@@ -118,10 +119,12 @@ def play_game
   player_hit
   player_hit
   @player_score = calculate_score(@player_hand, @player_score)
-  puts "Your cards total #{@player_score}."
-  # score_evaluation
 
-  puts
+  while @player_score < 21 do 
+    puts "Your cards total #{@player_score}."
+    score_evaluation
+    @player_score = calculate_score(@player_hand, @player_score)
+  end#while
 
   
 
