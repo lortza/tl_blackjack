@@ -58,21 +58,14 @@ def player_hit
 end#player_hit
 
 
-def create_player_total
-  @player_hand.each do |x|
-    @player_score << x[:value]
+def calculate_score(hand, score)
+  hand.each do |x|
+    score << x[:value]
   end#each
-  @player_score = @player_score.inject(:+)
-end#create_total
-
-
-def create_dealer_total
-  @dealer_hidden_hand.each do |x|
-    @dealer_hidden_score << x[:value]
-  end#each
-  @dealer_hidden_score = @dealer_hidden_score.inject(:+)
-end#create_total
-
+  score = score.inject(:+)
+  #puts "calculate_score's score: #{score}"
+  score
+end#calculate_score
 
 def stand
   
@@ -96,7 +89,7 @@ def request_action
 end#request_action
 
 def score_evaluation
-  create_dealer_total
+  calculate_score(@dealer_hidden_hand, @dealer_hidden_score)
   if @player_score.to_i < 21
     puts "Dealer has #{@dealer_hidden_score}. You may Hit or Stand. "
     request_action
@@ -118,20 +111,26 @@ def play_game
   dealer_hit
   dealer_hit
   #puts "and one card you can't see"
+  @dealer_hidden_score = calculate_score(@dealer_hidden_hand, @dealer_hidden_score)
+  puts "The Dealer's cards total #{@dealer_hidden_score}."
   puts
   puts "Your Hand:"
   player_hit
   player_hit
+  @player_score = calculate_score(@player_hand, @player_score)
+  puts "Your cards total #{@player_score}."
+  # score_evaluation
+
   puts
-  create_player_total
-  puts "Your total is #{@player_score}."
-  score_evaluation
-  puts
+
   
+
     
 end#play_game
 
 play_game
+
+
 
 # puts "Would you like to play again?  Y | N"
 # want_to_play = gets.chomp
