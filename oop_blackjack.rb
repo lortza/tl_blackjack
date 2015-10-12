@@ -125,20 +125,45 @@ class Dealer
 end
 
 
+def play_game
+
+  deck = Deck.new
+
+  player = Player.new("Chris")
+  player.add_card(deck.deal_one)
+  player.add_card(deck.deal_one)
+  player.add_card(deck.deal_one)
+  player.add_card(deck.deal_one)
+  player.show_hand
+
+  dealer = Dealer.new
+  dealer.add_card(deck.deal_one)
+  dealer.add_card(deck.deal_one)
+  dealer.add_card(deck.deal_one)
+  dealer.add_card(deck.deal_one)
+  dealer.show_hand
+     
 
 
-deck = Deck.new
 
-player = Player.new("Chris")
-player.add_card(deck.deal_one)
-player.add_card(deck.deal_one)
-player.add_card(deck.deal_one)
-player.add_card(deck.deal_one)
-player.show_hand
+   play_again_query
+end #play_game
 
-dealer = Dealer.new
-dealer.add_card(deck.deal_one)
-dealer.add_card(deck.deal_one)
-dealer.add_card(deck.deal_one)
-dealer.add_card(deck.deal_one)
-dealer.show_hand
+def play_again_query
+  puts "Play again? Y | N"
+  @input = gets.chomp.upcase 
+  if @input == "Y"
+    play_game
+  elsif @input == "N"
+    puts "Okay Bye."
+  else
+    while @input != "N" && @input != "Y"
+      puts "I'm sorry, that's not an option."
+      play_again_query
+    end #while
+  end #if
+end #play_again_query
+
+play_game
+
+
