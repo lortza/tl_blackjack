@@ -1,168 +1,144 @@
+# this version is based on the code from the class solution. i am using it to create the gameplay engine.
 # assignment: https://www.gotealeaf.com/lessons/f4d7b093/assignments/1653
-# create the deck
-# define game play
-  # shuffle the deck
-  # player draws
-  # ask player Stand or Hit
-  # perform Stand or Hit
-  # sum the cards
 
-# arrays needed to create_deck
-@deck_suits = ["clubs", "diamonds", "hearts", "spades"]
-@deck_numbers = ["J", "Q", "K", "A"]
-@deck = []
+require 'rubygems'
+require 'pry'
 
-# arrays needed for totals and play actions
-want_to_play = "Y"
-@dealer_visible_hand = []
-@dealer_visible_score = []
-@dealer_hidden_hand = []
-@dealer_hidden_score = []
-@player_hand = []
-@player_score = []
+# Object Oriented Blackjack game
 
-# methods to create a deck with names and values
+# 1) Abstraction
+# 2) Encapsulation
 
-def create_deck
-  (2..10).each do |num| 
-    @deck_numbers << num
+class Card
+  attr_accessor :suit, :face_value
+
+  def initialize(s, fv)
+    @suit = s
+    @face_value = fv
   end
 
-  @deck_suits.each do |suit|
-    @deck_numbers.each do |num|
-      if num == "A"
-        @deck << {name: "#{num} #{suit.capitalize}", value: 11 }
-      elsif num == "J" || num == "Q" || num == "K" # OR elsif num.to_i == 0
-        @deck << {name: "#{num} #{suit.capitalize}", value: 10 }
-      else 
-        @deck << {name: "#{num} of #{suit.capitalize}", value: num }
-      end#if
-    end#each
-  end#each
-end#create_deck
+  def pretty_output
+    "The #{face_value} of #{find_suit}"
+  end
 
+  def to_s
+    pretty_output
+  end
 
-# methods for play actions
-def dealer_hit
-  card = @deck.pop
-  @dealer_hidden_hand << card
-  @dealer_visible_hand << card
-  puts card[:name]
-end#dealer_hit
+  def find_suit
+    ret_val = case suit
+                when 'H' then 'Hearts'
+                when 'D' then 'Diamonds'
+                when 'S' then 'Spades'
+                when 'C' then 'Clubs'
+              end
+    ret_val
+  end
+end
 
+class Deck
+  attr_accessor :cards
 
-def player_hit
-  card = @deck.pop
-  @player_hand << card
-  puts card[:name]
-end#player_hit
+  def initialize
+    @cards = []
+    ['H', 'D', 'S', 'C'].each do |suit|
+      ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'].each do |face_value|
+        @cards << Card.new(suit, face_value)
+      end
+    end
+    scramble!
+  end
 
+  def scramble!
+    cards.shuffle!
+  end
 
-def calculate_score(hand, score)
-  catcher = []
-  hand.each do |x|
-    catcher << x[:value]
-  end#each
-  score = catcher.inject(:+)
-  #puts "calculate_score's score: #{score}"
-  score
-end#calculate_score
+  def deal_one
+    cards.pop
+  end
 
-def stand
-  
-end#stand
+  def size
+    cards.size
+  end
+end
 
+module Hand
+  def show_hand
+    puts "---- #{name}'s Hand ----"
+    cards.each do|card|
+      puts "=> #{card}"
+    end
+    puts "=> Total: #{total}"
+  end
 
-def bust
+  def total
+    face_values = cards.map{|card| card.face_value }
 
-end#bust
+    total = 0
+    face_values.each do |val|
+      if val == "A"
+        total += 11
+      else
+        total += (val.to_i == 0 ? 10 : val.to_i)
+      end
+    end
 
-def request_action
-  puts "Please choose:"
-  puts " 1) Hit"
-  puts " 2) Stand"
-  input = gets.chomp
-  if input == "1"
-    player_hit
-  else
-    puts "STAND"
-  end#if
-end#request_action
+    #correct for Aces
+    face_values.select{|val| val == "A"}.count.times do
+      break if total <= 21
+      total -= 10
+    end
 
-def score_evaluation
-  puts
-  if @player_score.to_i < 21
-    puts "Dealer has #{@dealer_hidden_score}. You may Hit or Stand. "
-    request_action
-  elsif @player_score.to_i == 21
-    puts "You win."
-  else
-    puts "I'm sorry, you busted."
-  end#if
-end#score_evaluation
+    total
+  end
 
+  def add_card(new_card)
+    cards << new_card
+  end
 
+  def is_busted?
+    total > 21
+  end
+end
 
-def play_game
-  create_deck
+class Player
+  include Hand
 
-  @deck.shuffle!
+  attr_accessor :name, :cards
 
-  puts "Dealer's Hand:"
-  dealer_hit
-  dealer_hit
-  #puts "and one card you can't see"
-  @dealer_hidden_score = calculate_score(@dealer_hidden_hand, @dealer_hidden_score)
-  puts "The Dealer's cards total #{@dealer_hidden_score}."
-  puts
-  puts "Your Hand:"
-  player_hit
-  player_hit
-  @player_score = calculate_score(@player_hand, @player_score)
+  def initialize(n)
+    @name = n
+    @cards = []
+  end
 
-  while @player_score < 21 do 
-    puts "Your cards total #{@player_score}."
-    score_evaluation
-    @player_score = calculate_score(@player_hand, @player_score)
-  end#while
+end
 
-  
+class Dealer
+  include Hand
 
-    
-end#play_game
+  attr_accessor :name, :cards
 
-play_game
-
-
-
-# puts "Would you like to play again?  Y | N"
-# want_to_play = gets.chomp
-# if want_to_play.upcase.include? "Y"
-#   play_game
-# else
-#   puts "okay bye"
-# end#if
+  def initialize
+    @name = "Dealer"
+    @cards = []
+  end
+end
 
 
 
 
-# case 
-# when card.include?("J")
-#   user_score << 10
-# when card.include?("Q")
-#   user_score << 10
-# when card.include?("K")
-#   user_score << 10
-# when card.include?("A ")
-#   puts "Please select:"
-#   puts "1) Low (+1)"
-#   puts "2) High (+11)"
-#   ace_choice = gets.chomp
-#     if ace_choice == "1"
-#       user_score << 1
-#     else
-#       user_score << 11
-#     end#if
-# end#whencase
+deck = Deck.new
 
+player = Player.new("Chris")
+player.add_card(deck.deal_one)
+player.add_card(deck.deal_one)
+player.add_card(deck.deal_one)
+player.add_card(deck.deal_one)
+player.show_hand
 
+dealer = Dealer.new
+dealer.add_card(deck.deal_one)
+dealer.add_card(deck.deal_one)
+dealer.add_card(deck.deal_one)
+dealer.add_card(deck.deal_one)
+dealer.show_hand
