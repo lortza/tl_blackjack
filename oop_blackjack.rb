@@ -203,8 +203,22 @@ class Game
       blackjack_or_bust?(player)
     end #while
     puts "#{player.name} stays at #{player.total}."
-      
   end #player_turn
+
+  def dealer_turn
+    puts "Dealer's Turn..."
+    blackjack_or_bust?(dealer)
+    while dealer.total < DEALER_HIT_MIN
+      new_card = deck.deal_one
+      puts "Dealing card to dealer: #{new_card}"
+      dealer.add_card(new_card)
+      puts "Dealer total is now: #{dealer.total}"
+
+      blackjack_or_bust?(dealer)
+    end #while
+    puts "Dealer stays at #{dealer.total}."   
+  end #dealer_turn
+    
     
 
   def play_game
@@ -215,7 +229,7 @@ class Game
     deal_cards
     show_exposed_cards
     player_turn
-    # dealer_turn
+    dealer_turn
     # who_won?(player, dealer)
 
 
@@ -224,7 +238,7 @@ class Game
   end #play_game
 end #Game
 
-def play_again_query
+def play_again_query #this currently tacks on to the current hand when playing again
   puts "Play again? Y | N"
   @input = gets.chomp.upcase 
   if @input == "Y"
