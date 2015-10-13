@@ -80,17 +80,17 @@ module Hand
         total += 11
       else
         total += (val.to_i == 0 ? 10 : val.to_i)
-      end
-    end
+      end #if
+    end #each
 
     #correct for Aces
     face_values.select{|val| val == "A"}.count.times do
       break if total <= 21
       total -= 10
-    end
+    end #break if
 
     total
-  end
+  end #total
 
   def add_card(new_card)
     cards << new_card
@@ -121,33 +121,60 @@ class Dealer
   def initialize
     @name = "Dealer"
     @cards = []
-  end
-end
+  end #initialize
+
+  def show_hand
+    puts "---- Dealer's Hand ----"
+    puts "(The first card is hidden)"
+    puts "The second card is #{cards[1]}"
+  end #show_hand
+end #Dealer
 
 
-def play_game
+class Game
+  attr_accessor :deck, :player, :dealer
+  def initialize
+    @deck = Deck.new
+    @player = Player.new("You")
+    @dealer = Dealer.new 
+  end #initialize
 
-  deck = Deck.new
+  def set_player_name
+    puts "Please enter your name:" 
+    player.name = gets.chomp
+  end #set_player_name
 
-  player = Player.new("Chris")
-  player.add_card(deck.deal_one)
-  player.add_card(deck.deal_one)
-  player.add_card(deck.deal_one)
-  player.add_card(deck.deal_one)
-  player.show_hand
+  def deal_cards
+    player.add_card(deck.deal_one) 
+    dealer.add_card(deck.deal_one) 
+    player.add_card(deck.deal_one) 
+    dealer.add_card(deck.deal_one)
+  end #deal_cards
 
-  dealer = Dealer.new
-  dealer.add_card(deck.deal_one)
-  dealer.add_card(deck.deal_one)
-  dealer.add_card(deck.deal_one)
-  dealer.add_card(deck.deal_one)
-  dealer.show_hand
-     
+  def show_exposed_cards
+    player.show_hand
+    dealer.show_hand 
+  end #show_exposed_cards
+    
+    
+    
+
+  def play_game
+    puts "Welcome to Blackjack"
+    puts "You and the Dealer will each be dealt 2 cards."
+
+    set_player_name
+    deal_cards
+    show_exposed_cards
+    # player_turn
+    # dealer_turn
+    # who_won?(player, dealer)
 
 
 
-   play_again_query
-end #play_game
+     #play_again_query
+  end #play_game
+end #Game
 
 def play_again_query
   puts "Play again? Y | N"
@@ -164,6 +191,7 @@ def play_again_query
   end #if
 end #play_again_query
 
-play_game
+game = Game.new
+game.play_game
 
 
