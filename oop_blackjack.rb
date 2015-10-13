@@ -85,7 +85,7 @@ module Hand
 
     #correct for Aces
     face_values.select{|val| val == "A"}.count.times do
-      break if total <= 21
+      break if total <= Game::BLACKJACK_AMOUNT
       total -= 10
     end #break if
 
@@ -97,7 +97,7 @@ module Hand
   end
 
   def is_busted?
-    total > 21
+    total > Game::BLACKJACK_AMOUNT
   end
 end
 
@@ -167,14 +167,14 @@ class Game
       else
         puts "Congratulations, you hit blackjack! #{player.name} win!"
       end #if Dealer
-      play_again?
+      play_again_query
     elsif player_or_dealer.is_busted?
       if player_or_dealer.is_a?(Dealer)
         puts "Congratulations, dealer busted. #{player.name} win!"
       else
         puts "Sorry, #{player.name} busted. #{player.name} loses."
       end #Dealer
-      play_again?
+      play_again_query
     end #if totals
   end #blackjack_or_bust
     
@@ -218,6 +218,36 @@ class Game
     end #while
     puts "Dealer stays at #{dealer.total}."   
   end #dealer_turn
+
+  def who_won?(player, dealer)
+    if player.total > dealer.total
+    puts "Congrats! #{player.name} wins!"
+    elsif dealer.total > player.total
+      puts "Sorry, Dealer wins. YOU LOSE!!!!! Bwahahahahahaaa!"
+    else
+      puts "It's a tie. That's lame."
+    end #if
+    play_again_query
+  end #who_won?
+
+  def play_again_query 
+    puts "Play again? Y | N"
+    @input = gets.chomp.upcase 
+    if @input == "Y"
+      deck = Deck.new # this refills the deck
+      player.cards = []# this empties the player hand
+      dealer.cards = []# this empties the dealer hand
+      play_game
+    elsif @input == "N"
+      puts "Okay Bye."
+      exit
+    else
+      while @input != "N" && @input != "Y"
+        puts "I'm sorry, that's not an option."
+        play_again_query
+      end #while
+    end #if
+  end #play_again_query
     
     
 
@@ -230,28 +260,13 @@ class Game
     show_exposed_cards
     player_turn
     dealer_turn
-    # who_won?(player, dealer)
-
-
+    who_won?(player, dealer)
 
      #play_again_query
   end #play_game
 end #Game
 
-def play_again_query #this currently tacks on to the current hand when playing again
-  puts "Play again? Y | N"
-  @input = gets.chomp.upcase 
-  if @input == "Y"
-    play_game
-  elsif @input == "N"
-    puts "Okay Bye."
-  else
-    while @input != "N" && @input != "Y"
-      puts "I'm sorry, that's not an option."
-      play_again_query
-    end #while
-  end #if
-end #play_again_query
+
 
 game = Game.new
 game.play_game
