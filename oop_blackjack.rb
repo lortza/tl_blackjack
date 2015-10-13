@@ -133,6 +133,10 @@ end #Dealer
 
 class Game
   attr_accessor :deck, :player, :dealer
+
+  BLACKJACK_AMOUNT = 21
+  DEALER_HIT_MIN = 17
+
   def initialize
     @deck = Deck.new
     @player = Player.new("You")
@@ -155,8 +159,52 @@ class Game
     player.show_hand
     dealer.show_hand 
   end #show_exposed_cards
+
+  def blackjack_or_bust?(player_or_dealer)
+    if player_or_dealer.total == BLACKJACK_AMOUNT
+      if player_or_dealer.is_a?(Dealer)
+        puts "Uh oh! The Dealer hit blackjack. #{player.name} loses."
+      else
+        puts "Congratulations, you hit blackjack! #{player.name} win!"
+      end #if Dealer
+      play_again?
+    elsif player_or_dealer.is_busted?
+      if player_or_dealer.is_a?(Dealer)
+        puts "Congratulations, dealer busted. #{player.name} win!"
+      else
+        puts "Sorry, #{player.name} busted. #{player.name} loses."
+      end #Dealer
+      play_again?
+    end #if totals
+  end #blackjack_or_bust
     
-    
+  def player_turn
+    puts "#{player.name}'s Turn..."
+
+    blackjack_or_bust?(player)
+    while !player.is_busted?
+      puts "What would you like to do? 1) Hit or 2) Stand?"
+      response = gets.chomp
+      if !['1', '2'].include?(response)
+        puts "Error: you must enter 1 or 2"
+        next
+      end #if !1 !2
+      if response == '2'
+        puts "#{player.name} chose to stay."
+        break
+      end #if 2
+
+      #hit
+      new_card = deck.deal_one
+      puts "Dealing card to #{player.name}: #{new_card}"
+      player.add_card(new_card)
+      puts "#{player.name}'s total is now: #{player.total}"
+
+      blackjack_or_bust?(player)
+    end #while
+    puts "#{player.name} stays at #{player.total}."
+      
+  end #player_turn
     
 
   def play_game
@@ -166,7 +214,7 @@ class Game
     set_player_name
     deal_cards
     show_exposed_cards
-    # player_turn
+    player_turn
     # dealer_turn
     # who_won?(player, dealer)
 
